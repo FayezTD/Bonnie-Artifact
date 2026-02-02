@@ -16,15 +16,15 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ChatFormComponent } from '../components/chat-form/chat-form.component';
+import { ChatFormComponent } from '../chat-form/chat-form.component';
 import {
     ChatApiHeaders,
     ChatMessage,
     ChatRequestModel,
     FormSubmissionResult,
     TableData
-} from '../interfaces/chat.interfaces';
-import { ChatService } from '../services/chat.services';
+} from '../../interfaces/chat.interfaces';
+import { ChatService } from '../../services/chat.services';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
