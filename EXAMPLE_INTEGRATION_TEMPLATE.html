@@ -1,0 +1,99 @@
+<!-- 
+  Example Template for Integrating Kobie Loyalty Chatbot
+  
+  This is a minimal example showing how to use the chatbot
+  in your Angular application.
+-->
+
+<div class="app-container">
+  
+  <!-- Your Website Header -->
+  <header class="app-header">
+    <div class="container">
+      <h1>{{ title }}</h1>
+      <p>Your website content goes here</p>
+    </div>
+  </header>
+
+  <!-- Your Website Content -->
+  <main class="app-content">
+    <div class="container">
+      
+      <!-- Demo Controls (Remove in production) -->
+      <div class="demo-controls">
+        <h2>Chatbot Demo Controls</h2>
+        <button (click)="clearChat()">Clear Chat</button>
+        <button (click)="getMessages()">Get Messages</button>
+        <button (click)="toggleChat()">
+          {{ chatDisabled ? 'Enable' : 'Disable' }} Chat
+        </button>
+      </div>
+
+      <!-- Your regular website content -->
+      <div class="content-section">
+        <h2>Welcome to Kobie</h2>
+        <p>Your website content continues here...</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 
+    ============================================================
+    KOBIE LOYALTY CHATBOT INTEGRATION
+    ============================================================
+    
+    Simply add this component anywhere in your template.
+    The chatbot will appear as a floating button in the
+    bottom-right corner.
+  -->
+  
+  <!-- MINIMAL USAGE (Just the essentials) -->
+  <!-- <klc-chat [userid]="userid"></klc-chat> -->
+
+  <!-- FULL CONFIGURATION (All options) -->
+  <klc-chat
+    [title]="chatTitle"
+    [authToken]="authToken"
+    [userRole]="userRole"
+    [userid]="userid"
+    [username]="username"
+    [selectedModel]="selectedModel"
+    [disabled]="chatDisabled"
+    (messageEvent)="onMessageEvent($event)">
+  </klc-chat>
+
+  <!-- 
+    ============================================================
+    That's it! The chatbot is now integrated.
+    ============================================================
+  -->
+
+</div>
+
+<!-- 
+  NOTES:
+  
+  1. The chatbot floats in the bottom-right corner by default
+  2. It's responsive and works on all devices
+  3. All styling is included - no additional CSS needed
+  4. Assets (images) are bundled with the library
+  5. You can place <klc-chat> anywhere in your template
+  
+  CUSTOMIZATION:
+  
+  To customize position, add CSS in your styles:
+  
+  klc-chat {
+    // Change position
+    .chat-container {
+      bottom: 20px;
+      right: 20px;
+    }
+    
+    // Change colors
+    .chat-header {
+      background: your-gradient-here;
+    }
+  }
+-->
