@@ -81,14 +81,10 @@ export class ChatService {
    * Generate a unique UUID (10-digit format)
    */
   private generateUUID(): string {
-    const bytes = crypto.getRandomValues(new Uint8Array(6)); // 48 bits
-    let value = 0n;
-    for (const b of bytes) {
-      value = (value << 8n) + BigInt(b);
-    }
-
-    const id = (value % 10_000_000_000n).toString().padStart(10, "0");
-    return id;
+    const timestamp = Date.now().toString();
+    const random = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    const combined = timestamp + random;
+    return combined.slice(-10);
   }
 
   /**
