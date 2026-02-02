@@ -1,0 +1,432 @@
+// src/app/components/chat-form/chat-form.component.scss
+
+// ============================================================================
+// VARIABLES
+// ============================================================================
+
+$primary-color: #3b82f6;
+$primary-hover: #2563eb;
+$primary-active: #1d4ed8;
+$error-color: #ef4444;
+$text-primary: #374151;
+$text-secondary: #6b7280;
+$text-light: #9ca3af;
+$border-color: #d1d5db;
+$border-hover: #9ca3af;
+$bg-white: #ffffff;
+$bg-light: #f9fafb;
+$bg-lighter: #f3f4f6;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+// ============================================================================
+// CHAT FORM CONTAINER
+// ============================================================================
+
+.chat-form-container {
+    background: $bg-white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 12px 0;
+    box-shadow: $shadow-sm;
+    max-width: 500px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    &:focus-within {
+        .form-header .form-title {
+            color: #1f2937;
+        }
+    }
+}
+
+// ============================================================================
+// FORM HEADER
+// ============================================================================
+
+.form-header {
+    margin-bottom: 24px;
+
+    .form-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+    }
+
+    .form-description {
+        font-size: 14px;
+        color: $text-secondary;
+        margin: 0;
+        line-height: 1.5;
+    }
+}
+
+// ============================================================================
+// DYNAMIC FORM
+// ============================================================================
+
+.dynamic-form {
+    .form-fields {
+        .form-field {
+            margin-bottom: 20px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// INPUT GROUPS (Text, Email, Number, Textarea, Select)
+// ============================================================================
+
+.input-group {
+    .field-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
+        margin-bottom: 6px;
+        line-height: 1.4;
+
+        .required-asterisk {
+            color: $error-color;
+            margin-left: 2px;
+        }
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        font-size: 14px;
+        line-height: 1.4;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        &.error {
+            border-color: $error-color;
+
+            &:focus {
+                border-color: $error-color;
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            }
+        }
+
+        &::placeholder {
+            color: $text-light;
+        }
+
+        &:disabled {
+            background-color: $bg-lighter;
+            color: $text-secondary;
+            cursor: not-allowed;
+        }
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+        max-height: 200px;
+        font-family: inherit;
+    }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 8px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+        padding-right: 32px;
+        appearance: none;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+}
+
+// ============================================================================
+// CHECKBOX GROUPS
+// ============================================================================
+
+.checkbox-group {
+    .checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover .form-checkbox {
+            border-color: $primary-color;
+        }
+
+        .form-checkbox {
+            margin-right: 8px;
+            margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            accent-color: $primary-color;
+            cursor: pointer;
+            flex-shrink: 0;
+
+            &:focus {
+                outline: 2px solid $primary-color;
+                outline-offset: 2px;
+            }
+        }
+
+        .checkbox-text {
+            font-size: 14px;
+            color: $text-primary;
+            line-height: 1.5;
+
+            .required-asterisk {
+                color: $error-color;
+                margin-left: 2px;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// RADIO GROUPS
+// ============================================================================
+
+.radio-group {
+    .field-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
+        margin-bottom: 8px;
+        line-height: 1.4;
+
+        .required-asterisk {
+            color: $error-color;
+            margin-left: 2px;
+        }
+    }
+
+    .radio-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover .form-radio {
+            border-color: $primary-color;
+        }
+
+        .form-radio {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            accent-color: $primary-color;
+            cursor: pointer;
+            flex-shrink: 0;
+
+            &:focus {
+                outline: 2px solid $primary-color;
+                outline-offset: 2px;
+            }
+        }
+
+        .radio-text {
+            font-size: 14px;
+            color: $text-primary;
+            line-height: 1.4;
+        }
+    }
+}
+
+// ============================================================================
+// ERROR MESSAGES
+// ============================================================================
+
+.error-message {
+    margin-top: 4px;
+    font-size: 12px;
+    color: $error-color;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+
+    &::before {
+        content: "⚠";
+        margin-right: 4px;
+        font-size: 10px;
+    }
+}
+
+// ============================================================================
+// FORM ACTIONS
+// ============================================================================
+
+.form-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 80px;
+        position: relative;
+
+        &:focus {
+            outline: 2px solid $primary-color;
+            outline-offset: 2px;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        &:not(:disabled):hover {
+            transform: translateY(-1px);
+        }
+
+        &:not(:disabled):active {
+            transform: translateY(0);
+        }
+    }
+
+    .btn-secondary {
+        background: $bg-white;
+        color: $text-primary;
+        border-color: $border-color;
+
+        &:hover:not(:disabled) {
+            background: $bg-light;
+            border-color: $border-hover;
+        }
+
+        &:active:not(:disabled) {
+            background: $bg-lighter;
+        }
+    }
+
+    .btn-primary {
+        background: $primary-color;
+        color: $bg-white;
+
+        &:hover:not(:disabled) {
+            background: $primary-hover;
+        }
+
+        &:active:not(:disabled) {
+            background: $primary-active;
+        }
+    }
+}
+
+// ============================================================================
+// LOADING SPINNER
+// ============================================================================
+
+.loading-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - TABLET
+// ============================================================================
+
+@media (max-width: 768px) {
+    .chat-form-container {
+        padding: 20px;
+        margin: 10px 0;
+        max-width: 100%;
+    }
+
+    .form-header {
+        margin-bottom: 20px;
+
+        .form-title {
+            font-size: 16px;
+        }
+    }
+
+    .form-actions {
+        margin-top: 20px;
+    }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - MOBILE
+// ============================================================================
+
+@media (max-width: 480px) {
+    .chat-form-container {
+        padding: 16px;
+        margin: 8px 0;
+    }
+
+    .form-header {
+        margin-bottom: 16px;
+    }
+
+    .dynamic-form .form-fields .form-field {
+        margin-bottom: 16px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .input-group {
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            font-size: 16px; // Prevents zoom on iOS
+        }
+    }
+}

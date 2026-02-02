@@ -1,0 +1,447 @@
+<!-- ============================================================================ -->
+<!-- CHAT CONTAINER -->
+<!-- ============================================================================ -->
+<div class="chat-container" [class.collapsed]="isCollapsed" [class.maximized]="isMaximized"
+    (click)="onDocumentClick($event)">
+
+    <!-- ========================================================================== -->
+    <!-- HEADER -->
+    <!-- ========================================================================== -->
+    <div class="chat-header" (click)="isCollapsed && toggleCollapsed()">
+        <div class="header-left">
+            <div class="avatar-container-outer">
+                <div class="avatar-container">
+                    <img src="../../assets/bonnie-avatar-solid.png" alt="Bonnie" class="avatar" />
+
+                    <!-- Notification badge for collapsed state -->
+                    <div *ngIf="isCollapsed && hasUnreadMessages" class="notification-badge">
+                        {{ unreadCount }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Show title only when expanded -->
+            <h3 class="chat-title" *ngIf="!isCollapsed">
+                {{ title }}
+                <span class="subtitle" *ngIf="!isMaximized">
+                    {{ subtitle || 'Loyalty Marketing AI Assistant' }}
+                </span>
+            </h3>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions" *ngIf="!isCollapsed">
+            <!-- Export Chat to PDF Button -->
+            <button class="export-chat-btn" (click)="exportChatToPDF()" title="Export chat as PDF with KPIs">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 7l-5-5-5 5"></path>
+                    <path d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4"></path>
+                </svg>
+            </button>
+
+            <!-- Clear Context Button -->
+            <button class="clear-context-btn" (click)="clearChatContext()" title="Clear conversation">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15A9 9 0 1 1 12 3a9 9 0 0 1 8.49 6"></path>
+                </svg>
+            </button>
+
+            <!-- Maximize/Minimize Button -->
+            <button class="maximize-btn" (click)="toggleMaximized()"
+                [title]="isMaximized ? 'Minimize chat' : 'Maximize chat'">
+
+                <!-- Maximize icon -->
+                <svg *ngIf="!isMaximized" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path
+                        d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                    </path>
+                </svg>
+
+                <!-- Minimize icon -->
+                <svg *ngIf="isMaximized" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M5 12h14"></path>
+                </svg>
+            </button>
+
+            <!-- Minimize button -->
+            <button class="collapse-btn" (click)="toggleCollapsed()" title="Minimize chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- MESSAGES CONTAINER -->
+    <!-- ========================================================================== -->
+    <div *ngIf="!isCollapsed" class="messages-container" #messagesContainer (scroll)="onMessagesScroll()">
+
+        <ng-container *ngFor="let message of messages; trackBy: trackByMessageId">
+
+            <!-- ====================================================================== -->
+            <!-- MAIN MESSAGE -->
+            <!-- ====================================================================== -->
+            <div class="message-wrapper" [class.user-message]="message.isUser" [class.bot-message]="!message.isUser">
+
+                <div class="message-content">
+
+                    <!-- Bot Avatar -->
+                    <div *ngIf="!message.isUser" class="message-avatar">
+                        <img src="../../assets/bonnie-chat-icon.png" alt="Bot" class="avatar-small" />
+                    </div>
+
+                    <div class="message-column">
+
+                        <!-- Bonnie Header for Bot Messages -->
+                        <div *ngIf="!message.isUser" class="bot-message-header">
+                            <span class="bonnie-name">Bonnie</span>
+                        </div>
+
+                        <!-- Message Bubble -->
+                        <div class="message-bubble" [class.user-bubble]="message.isUser"
+                            [class.bot-bubble]="!message.isUser">
+
+                            <!-- Text Content -->
+                            <div *ngIf="message.message" class="message-text"
+                                [class.bot-message-content]="!message.isUser">
+                                <span [innerHTML]="formatMessageText(message.message)"></span>
+                            </div>
+
+                            <!-- ================================================================ -->
+                            <!-- FORM COMPONENT INTEGRATION (Will be used later) -->
+                            <!-- ================================================================ -->
+                            <div *ngIf="message.hasForm && message.formData" class="form-container">
+                                <app-chat-form [formData]="message.formData"
+                                    (formSubmit)="onFormSubmit($event, message.id)"
+                                    (formCancel)="onFormCancel($event, message.id)">
+                                </app-chat-form>
+                            </div>
+
+                            <!-- ================================================================ -->
+                            <!-- METRICS DISPLAY (Object Structure) -->
+                            <!-- ================================================================ -->
+                            <div *ngIf="message.metricsQuery 
+                       && isMetricsObject(message.metricsQuery) 
+                       && getMetricsObjectEntries(message.metricsQuery).length > 0" class="metrics-container"
+                                [class.minimized]="!isMaximized">
+
+                                <!-- View KPIs Button -->
+                                <button *ngIf="!showMetrics[message.id]" class="view-kpis-btn"
+                                    (click)="toggleMetrics(message.id)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                    </svg>
+                                    <span>View KPIs</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+
+                                <!-- Metrics Table -->
+                                <div class="metrics-content" [id]="'metrics-' + message.id"
+                                    [class.hidden]="!showMetrics[message.id]">
+
+                                    <!-- Metrics Header -->
+                                    <div class="metrics-header">
+                                        <div class="metrics-header-left">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <line x1="12" y1="20" x2="12" y2="10"></line>
+                                                <line x1="18" y1="20" x2="18" y2="4"></line>
+                                                <line x1="6" y1="20" x2="6" y2="16"></line>
+                                            </svg>
+                                            <span class="metrics-title">Key Performance Indicators</span>
+                                        </div>
+
+                                        <button class="hide-kpis-btn" (click)="toggleMetrics(message.id)"
+                                            title="Hide KPIs">
+                                            <span>Hide</span>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <polyline points="18 15 12 9 6 15"></polyline>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Metrics Table Wrapper -->
+                                    <div class="metrics-table-wrapper" [class.minimized]="!isMaximized">
+                                        <table class="metrics-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Metric</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let entry of getMetricsObjectEntries(message.metricsQuery); let i = index"
+                                                    class="metric-row-hover"
+                                                    [attr.data-tooltip]="getKpiDefinition(entry.key)">
+                                                    <td class="metric-name">
+                                                        {{ formatMetricKey(entry.key) }}
+                                                    </td>
+                                                    <td class="metric-value">
+                                                        {{ entry.value }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Attachments -->
+                            <ng-container *ngIf="message.attachments?.length">
+                                <div *ngFor="let attachment of message.attachments" class="attachment-item">
+                                    <span class="attachment-icon">
+                                        {{ attachment.icon || '📎' }}
+                                    </span>
+                                    <div class="attachment-info">
+                                        <span class="attachment-name">{{ attachment.name }}</span>
+                                        <span *ngIf="attachment.size" class="attachment-size">
+                                            {{ attachment.size }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <!-- ================================================================ -->
+                        <!-- MESSAGE FOOTER (Bot Messages Only) -->
+                        <!-- ================================================================ -->
+                        <div *ngIf="!message.isUser" class="message-footer">
+
+                            <!-- Action Buttons -->
+                            <div class="message-actions compact">
+                                <div class="action-buttons">
+
+                                    <!-- Copy Button -->
+                                    <button class="action-btn copy-btn"
+                                        [ngClass]="{ 'copied': copiedMessages.has(message.id) }"
+                                        (click)="copyMessageContent(message)" title="Copy message">
+                                        <ng-container *ngIf="!copiedMessages.has(message.id); else copied">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1">
+                                                </path>
+                                            </svg>
+                                        </ng-container>
+                                        <ng-template #copied>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="green"
+                                                stroke-width="2">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </ng-template>
+                                    </button>
+
+                                    <!-- Read Aloud Button -->
+                                    <button class="action-btn read-btn" (click)="toggleReadAloud(message)"
+                                        title="Read aloud">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Export Metrics Button -->
+                                    <button *ngIf="message.metricsQuery && isMetricsObject(message.metricsQuery)"
+                                        class="action-btn metrics-export-btn"
+                                        (click)="exportMetricsDataFromObject(message.metricsQuery, message.id)"
+                                        title="Export metrics as CSV">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                            </path>
+                                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                            <path d="M9 14l2 2 4-4"></path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Download Report Button -->
+                                    <button *ngIf="message.fileLink" class="action-btn download-btn"
+                                        (click)="downloadReport(message.fileLink)" title="Download full report">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14,2 14,8 20,8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10,9 9,9 8,9"></polyline>
+                                        </svg>
+                                    </button>
+
+                                    <!-- More Actions Dropdown -->
+                                    <div class="more-actions-container">
+                                        <button class="action-btn more-btn" (click)="toggleMoreActions(message.id)"
+                                            title="More actions">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="1"></circle>
+                                                <circle cx="12" cy="5" r="1"></circle>
+                                                <circle cx="12" cy="19" r="1"></circle>
+                                            </svg>
+                                        </button>
+
+                                        <!-- More Actions Menu -->
+                                        <div class="more-actions-menu" *ngIf="showMoreActions[message.id]">
+
+                                            <!-- Share -->
+                                            <div class="dropdown-item" (click)="shareMessage(message)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                    <polyline points="16,6 12,2 8,6"></polyline>
+                                                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                                                </svg>
+                                                Share
+                                            </div>
+
+                                            <!-- Regenerate -->
+                                            <div class="dropdown-item" (click)="regenerateResponse(message)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                                    <path
+                                                        d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15">
+                                                    </path>
+                                                </svg>
+                                                Regenerate
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timestamp -->
+                            <div class="message-time">
+                                {{ formatTime(message.timestamp) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================================================================== -->
+            <!-- SUGGESTIONS SECTION -->
+            <!-- ====================================================================== -->
+            <div *ngIf="message.suggestions?.length && !message.isUser" class="message-wrapper suggestions-wrapper">
+                <div class="suggestions-content">
+                    <div class="suggestions-bubble">
+                        <div class="suggestions-buttons">
+                            <button *ngFor="let suggestion of getSortedSuggestions(message.suggestions)"
+                                class="suggestion-btn" (click)="onSuggestionClick(suggestion, message.id)">
+                                {{ suggestion }}
+                            </button>
+                        </div>
+                        <div class="suggested-actions-label">Suggested Actions</div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- ======================================================================== -->
+        <!-- PROCESSING INTERSTITIAL MESSAGE -->
+        <!-- ======================================================================== -->
+        <div *ngIf="showProcessingMessage" class="message-wrapper bot-message">
+            <div class="message-content">
+                <div class="message-avatar bot-avatar">
+                    <img src="../../assets/bonnie-chat-icon.png" alt="Bot" class="avatar-small" />
+                </div>
+                <div class="message-bubble bot-bubble processing-bubble">
+                    <div class="processing-message">
+                        <span class="processing-text">
+                            {{ getCurrentProcessingMessage() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================================== -->
+        <!-- TYPING INDICATOR -->
+        <!-- ======================================================================== -->
+        <div *ngIf="showTypingIndicator" class="message-wrapper bot-message">
+            <div class="message-content">
+                <div class="message-avatar bot-avatar">
+                    <img src="../../assets/bonnie-chat-icon.png" alt="Bot" class="avatar-small" />
+                </div>
+                <div class="message-bubble bot-bubble loading-bubble">
+                    <div class="typing-indicator">
+                        <div class="dots-animation">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- SCROLL TO BOTTOM BUTTON -->
+    <!-- ========================================================================== -->
+    <div *ngIf="!isCollapsed && showScrollButton" class="scroll-to-bottom-btn" (click)="scrollToBottom()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- INPUT AREA -->
+    <!-- ========================================================================== -->
+    <div *ngIf="!isCollapsed" class="input-container">
+        <div class="input-wrapper">
+
+            <!-- Input Section -->
+            <div class="input-section">
+                <textarea [(ngModel)]="newMessage" (input)="autoResize($event)" (keydown.enter)="sendMessage()"
+                    [placeholder]="inputPlaceholder" class="message-input" [disabled]="isTyping" rows="1">
+        </textarea>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <div class="right-controls">
+
+                    <!-- Send Button -->
+                    <button class="send-button" (click)="sendMessage()" [disabled]="!newMessage.trim() || isTyping"
+                        title="Send message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================================ -->
+<!-- FLOATING ACTION BUTTON (Collapsed State) -->
+<!-- ============================================================================ -->
+<div *ngIf="isCollapsed" class="floating-chat-button" (click)="toggleCollapsed()">
+    <div class="fab-content">
+        <img src="../../assets/bonnie-expanded-icon.png" alt="Bonnie" class="fab-avatar" />
+
+        <!-- Notification Badge -->
+        <div *ngIf="unreadCount > 0" class="fab-notification-badge">
+            {{ unreadCount }}
+        </div>
+    </div>
+</div>
