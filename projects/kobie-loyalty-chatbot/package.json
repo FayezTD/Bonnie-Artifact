@@ -1,12 +1,25 @@
 {
   "name": "kobie-loyalty-chatbot",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "Kobie Loyalty Assistant Chatbot - AI-powered customer support for loyalty marketing platforms",
+  "author": "Kobie Marketing",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "chatbot",
+    "loyalty",
+    "kobie",
+    "customer-support",
+    "ai-assistant"
+  ],
   "peerDependencies": {
-    "@angular/common": "^15.2.0",
-    "@angular/core": "^15.2.0"
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/forms": "^15.0.0",
+    "pdfmake": "^0.2.0"
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.0.0"
   },
   "sideEffects": false
 }
