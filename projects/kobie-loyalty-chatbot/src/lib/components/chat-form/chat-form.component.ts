@@ -10,7 +10,7 @@ import { ChatFormData, FormSubmissionResult } from '../../interfaces/chat.interf
 // ============================================================================
 
 @Component({
-  selector: 'app-chat-form',
+  selector: 'klc-chat-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './chat-form.component.html',
