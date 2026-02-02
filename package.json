@@ -55,6 +55,7 @@
     "dayjs": "^1.11.9",
     "html2canvas": "^1.4.1",
     "jquery": "^3.5.1",
+    "kobie-loyalty-chatbot": "file:kobie-loyalty-chatbot-1.0.0.tgz",
     "libphonenumber-js": "^1.10.34",
     "lodash-es": "^4.17.15",
     "moment": "^2.29.4",
