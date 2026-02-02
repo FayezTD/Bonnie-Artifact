@@ -3,7 +3,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChatFormData, FormSubmissionResult } from 'src/app/interfaces/chat.interfaces';
+import { ChatFormData, FormSubmissionResult } from '../../interfaces/chat.interfaces';
 
 // ============================================================================
 // COMPONENT
