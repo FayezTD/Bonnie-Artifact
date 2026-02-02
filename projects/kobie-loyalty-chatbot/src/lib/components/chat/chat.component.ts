@@ -32,7 +32,7 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
 
 @Component({
-    selector: 'app-chat',
+    selector: 'klc-chat',
     standalone: true,
     imports: [CommonModule, FormsModule, ChatFormComponent],
     templateUrl: './chat.component.html',
