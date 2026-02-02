@@ -3,7 +3,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { defaultEnvironment } from '../config/environment.config';
 import {
   ChatAttachment,
   ChatMessage,
