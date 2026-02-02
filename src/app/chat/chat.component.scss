@@ -1,0 +1,1737 @@
+// ============================================================================
+// BONNIE CHAT COMPONENT - SCSS STYLING
+// ============================================================================
+// Features: PDF export, animated loading messages, auto-expand on graph,
+// minimized KPI styling, responsive design
+
+// ============================================================================
+// VARIABLES
+// ============================================================================
+
+// Colors - Primary
+$primary-orange: #fd7e4f;
+$primary-purple: #8b7cd8;
+$suggestion-color: #5461C8;
+$primary-grey: #EBE9FE;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, #fd7e4f 0%, #5461C8 100%);
+$gradient-light: linear-gradient(135deg, rgba(253, 126, 79, 0.1) 0%, rgba(139, 124, 216, 0.1) 100%);
+$gradient-border: linear-gradient(135deg, $primary-orange 0%, $primary-purple 100%);
+
+// Colors - Text
+$text-primary: #374151;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+
+// Colors - Background
+$background-light: #f8fafc;
+$background-gray: #f5f5f5;
+
+// Colors - Borders
+$border-light: #e5e7eb;
+$border-lighter: #f1f3f4;
+
+// Colors - System
+$white: #ffffff;
+$success-color: #22c55e;
+$error-color: #ef4444;
+
+// ============================================================================
+// MIXINS
+// ============================================================================
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+}
+
+@mixin flex-end {
+    display: flex;
+    align-items: flex-end;
+}
+
+@mixin transition-base {
+    transition: all 0.3s ease;
+}
+
+@mixin button-hover {
+    &:hover {
+        transform: translateY(-2px);
+        @content;
+    }
+}
+
+@mixin scrollbar-style {
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $background-light;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+
+        &:hover {
+            background: #999;
+        }
+    }
+}
+
+// ============================================================================
+// FLOATING ACTION BUTTON (Collapsed State)
+// ============================================================================
+
+.floating-chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: bounceIn 0.5s ease-out;
+
+    .fab-content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: $suggestion-color;
+        border-radius: 50%;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+
+        .fab-avatar {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        .fab-notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: $error-color !important;
+            color: white !important;
+            border-radius: 12px;
+            min-width: 25px;
+            height: 25px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+    }
+
+    &:hover .fab-content {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+    }
+
+    &:active .fab-content {
+        transform: translateY(0px);
+    }
+}
+
+// ============================================================================
+// CHAT CONTAINER
+// ============================================================================
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    width: 480px;
+    max-width: 90vw;
+    background: $white;
+    border-radius: 24px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    z-index: 1000;
+    animation: slideInRight 0.3s ease-out;
+
+    // Maximized state - 90% viewport width
+    &.maximized {
+        width: 90vw;
+        max-width: 90vw;
+        height: 90vh;
+        max-height: 90vh;
+        border-radius: 16px;
+        bottom: 5vh;
+        right: 5vw;
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+    }
+
+    // Collapsed state
+    &.collapsed {
+        display: none;
+        height: auto;
+        width: 280px;
+        border-radius: 20px;
+
+        .chat-header {
+            padding: 16px 20px;
+            cursor: pointer;
+            @include transition-base;
+
+            &:hover {
+                transform: scale(1.02);
+            }
+        }
+
+        .messages-container,
+        .input-container {
+            display: none;
+        }
+    }
+}
+
+// ============================================================================
+// CHAT HEADER
+// ============================================================================
+
+.chat-header {
+    background: $gradient-primary;
+    color: $white;
+    padding: 24px 28px;
+    @include flex-center;
+    justify-content: space-between;
+    gap: 16px;
+    border-radius: 24px 24px 0 0;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .header-left {
+        @include flex-center;
+        gap: 14px;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .avatar-container-outer {
+        padding: 2px;
+        background-color: $white;
+        border-radius: 50%;
+    }
+
+    .avatar-container {
+        background-color: $white;
+        border: 2px $primary-orange solid;
+        padding: 8px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+
+        .avatar {
+            height: 42px;
+            object-fit: cover;
+            padding: 2px;
+            margin: 2px;
+        }
+    }
+
+    .chat-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+        .subtitle {
+            display: block;
+            font-size: 13px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+    }
+}
+
+// Header Actions
+.header-actions {
+    @include flex-center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+// Export Chat Button
+.export-chat-btn {
+    @include flex-center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: $white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    @include transition-base;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    svg {
+        stroke-width: 2;
+    }
+}
+
+// Clear Context Button
+.clear-context-btn {
+    @include flex-center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: $white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    @include transition-base;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    svg {
+        stroke-width: 2;
+    }
+}
+
+// Maximize Button
+.maximize-btn {
+    @include flex-center;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: $white;
+    cursor: pointer;
+    @include transition-base;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    svg {
+        stroke-width: 2;
+    }
+}
+
+// Collapse Button
+.collapse-btn {
+    @include flex-center;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: $white;
+    cursor: pointer;
+    @include transition-base;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    svg {
+        stroke-width: 2;
+    }
+}
+
+// Notification Badge
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: $error-color;
+    color: $white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    @include flex-center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid $white;
+    animation: pulse 2s infinite;
+}
+
+// ============================================================================
+// MESSAGES CONTAINER
+// ============================================================================
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    @include scrollbar-style;
+    background: linear-gradient(to bottom, $white 0%, #fafbfc 100%);
+}
+
+// ============================================================================
+// MESSAGE WRAPPER
+// ============================================================================
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 6px;
+
+    &.user-message {
+        justify-content: flex-end;
+
+        .message-content {
+            flex-direction: row-reverse;
+        }
+    }
+
+    &.bot-message {
+        justify-content: flex-start;
+    }
+
+    &.suggestions-wrapper {
+        justify-content: flex-end;
+        margin-left: 44px;
+    }
+}
+
+.message-content {
+    display: flex;
+    align-items: flex-start;
+    max-width: 80%;
+    gap: 12px;
+}
+
+// Message Column
+.message-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 100%;
+}
+
+// ============================================================================
+// MESSAGE AVATAR
+// ============================================================================
+
+.message-avatar {
+    align-self: flex-start;
+    position: sticky;
+    top: 0;
+
+    .avatar-small {
+        height: 32px;
+        object-fit: cover;
+        border: 2px solid $white;
+    }
+}
+
+// ============================================================================
+// MESSAGE BUBBLE
+// ============================================================================
+
+.message-bubble {
+    word-wrap: break-word;
+    position: relative;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    max-width: 100%;
+
+    &.user-bubble {
+        background: $suggestion-color;
+        color: $white !important;
+        border: 1px solid #e1e5f7;
+        border-radius: 18px 4px 18px 18px;
+        margin-left: auto;
+        padding: 16px 18px;
+    }
+
+    &.bot-bubble {
+        background: $primary-grey;
+        color: $text-primary;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px 18px 18px 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 0;
+        overflow: hidden;
+    }
+
+    &.loading-bubble {
+        background: $white;
+        border: 2px solid transparent;
+        background-image: linear-gradient($white, $white), $gradient-border;
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        border-radius: 4px 18px 18px 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    &.processing-bubble {
+        background: $primary-grey;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+}
+
+// Bot Message Header
+.bot-message-header {
+    @include flex-center;
+    gap: 10px;
+    background: #fafbfc;
+    padding: 12px 18px 0;
+
+    .bonnie-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: $text-primary;
+        letter-spacing: -0.2px;
+    }
+}
+
+// Bot Message Content
+.bot-message-content {
+    padding: 16px 18px;
+}
+
+// Message Text
+.message-text {
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 400;
+    padding: 16px 18px;
+
+    .user-message & {
+        padding: 0;
+    }
+
+    .special-text {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+    }
+}
+
+// ============================================================================
+// MESSAGE FOOTER
+// ============================================================================
+
+.message-footer {
+    display: flex;
+    gap: 4px;
+    margin-left: 0;
+    justify-content: space-between;
+    padding: 0 18px 8px;
+}
+
+// Message Time
+.message-time {
+    font-size: 11px;
+    opacity: 0.6;
+    color: $text-muted;
+    font-weight: 400;
+    text-align: left;
+}
+
+// ============================================================================
+// PROCESSING MESSAGE
+// ============================================================================
+
+.processing-message {
+    @include flex-center;
+    gap: 12px;
+    padding: 16px 18px;
+    color: $text-secondary;
+    font-size: 14px;
+    min-height: 50px;
+
+    .processing-text {
+        font-weight: 500;
+        animation: slideInProcessing 0.3s ease-out forwards;
+    }
+}
+
+// ============================================================================
+// TYPING INDICATOR
+// ============================================================================
+
+.typing-indicator {
+    @include flex-center;
+    justify-content: flex-start;
+    padding: 16px 18px;
+    min-width: 120px;
+    gap: 12px;
+    color: $text-muted;
+    font-size: 14px;
+
+    .typing-text {
+        display: none;
+    }
+
+    .dots-animation {
+        @include flex-center;
+        gap: 6px;
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #bbb;
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite ease-in-out both;
+            display: inline-block;
+
+            &:nth-child(1) {
+                animation-delay: -0.32s;
+            }
+
+            &:nth-child(2) {
+                animation-delay: -0.16s;
+            }
+
+            &:nth-child(3) {
+                animation-delay: 0s;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// SUGGESTIONS
+// ============================================================================
+
+.suggestions-content {
+    display: flex;
+    align-items: flex-start;
+    max-width: 85%;
+    gap: 12px;
+}
+
+.suggestions-bubble {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+
+    .suggestions-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    .suggestion-btn {
+        background: $white;
+        color: $suggestion-color;
+        border: 1px solid $suggestion-color;
+        padding: 12px 16px;
+        border-radius: 18px 4px 18px 18px;
+        font-size: 14px;
+        font-weight: 400;
+        cursor: pointer;
+        @include transition-base;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+        min-width: 200px;
+        text-align: left;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: slideInSuggestion 0.5s ease-out forwards;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        line-height: 1.4;
+
+        @for $i from 1 through 6 {
+            &:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.1}s;
+            }
+        }
+
+        &:hover {
+            background: lighten($suggestion-color, 45%);
+            border-color: $suggestion-color;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(84, 97, 200, 0.2);
+        }
+
+        &.selected {
+            background: $suggestion-color;
+            color: $white;
+            border-color: $suggestion-color;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $suggestion-color;
+            box-shadow: 0 0 0 3px rgba(84, 97, 200, 0.15);
+        }
+    }
+}
+
+// Suggested Actions Label
+.suggested-actions-label {
+    font-size: 11px;
+    color: $text-muted;
+    text-align: left;
+    margin-top: 8px;
+}
+
+// ============================================================================
+// MESSAGE ACTIONS
+// ============================================================================
+
+.message-actions {
+    margin: 0;
+    padding: 0;
+
+    &.compact {
+        padding: 0;
+    }
+}
+
+.action-buttons {
+    @include flex-center;
+    gap: 8px;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(6px);
+    @include transition-base;
+
+    .message-wrapper:hover & {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (hover: none) {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-btn {
+    @include flex-center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(139, 124, 216, 0.2);
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    color: $text-secondary;
+    cursor: pointer;
+    @include transition-base;
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+
+    &:hover {
+        background: $gradient-light;
+        border-color: rgba(253, 126, 79, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    svg {
+        opacity: 0.7;
+        @include transition-base;
+    }
+
+    &:hover svg {
+        opacity: 1;
+    }
+
+    &.success {
+        background: rgba(34, 197, 94, 0.15) !important;
+        border-color: rgba(34, 197, 94, 0.4) !important;
+        color: #059669 !important;
+    }
+}
+
+// Copy Button State
+.copy-btn.copied {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: green;
+}
+
+// More Actions
+.more-actions-container {
+    position: relative;
+
+    .more-actions-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: $white;
+        border: 1px solid $border-light;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        z-index: 10;
+        min-width: 150px;
+        margin-top: 4px;
+
+        .dropdown-item {
+            @include flex-center;
+            gap: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: $text-primary;
+            cursor: pointer;
+            @include transition-base;
+
+            &:hover {
+                background: $gradient-light;
+            }
+
+            svg {
+                opacity: 0.6;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// ATTACHMENTS
+// ============================================================================
+
+.attachment-item {
+    @include flex-center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, $white 0%, #fafbfc 100%);
+    border-radius: 16px;
+    margin: 10px 0;
+    border: 1px solid $border-light;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    .attachment-icon {
+        width: 36px;
+        height: 36px;
+        @include flex-center;
+        background: $gradient-primary;
+        border-radius: 12px;
+        color: $white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .attachment-info {
+        color: $text-primary;
+
+        .attachment-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .attachment-size {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    }
+}
+
+// ============================================================================
+// METRICS CONTAINER
+// ============================================================================
+
+.metrics-container {
+    contain: layout style paint;
+    background: $white;
+    border: 1px solid $border-light;
+    border-radius: 16px;
+    margin: 0px 18px 16px 18px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+    // Minimized styling when chat is not expanded
+    &.minimized {
+        .view-kpis-btn {
+            padding: 10px 14px;
+            font-size: 13px;
+
+            svg:first-child {
+                width: 14px;
+                height: 14px;
+            }
+
+            svg:last-child {
+                width: 12px;
+                height: 12px;
+            }
+
+            span {
+                font-size: 12px;
+            }
+        }
+
+        .metrics-header {
+            padding: 10px 14px;
+
+            .metrics-header-left {
+                gap: 8px;
+
+                svg {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+
+            .metrics-title {
+                font-size: 12px;
+            }
+        }
+
+        .metric-name,
+        .metric-value {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        thead th {
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+    }
+}
+
+// View KPIs Button
+.view-kpis-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 20px;
+    background: $gradient-primary;
+    color: white;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    &:hover::before {
+        left: 100%;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    span {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    svg:first-child {
+        width: 16px;
+        height: 16px;
+    }
+
+    svg:last-child {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.3s ease;
+    }
+
+    &:hover svg:last-child {
+        transform: translateY(2px);
+    }
+}
+
+// Metrics Content
+.metrics-content {
+    background: $white;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+// Metrics Header
+.metrics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: $gradient-primary;
+    color: white;
+    border-bottom: none;
+}
+
+.metrics-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    svg {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.metrics-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: white;
+}
+
+// Hide KPIs Button
+.hide-kpis-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-1px);
+    }
+
+    svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.3s ease;
+    }
+
+    &:hover svg {
+        transform: translateY(-2px);
+    }
+}
+
+// Metrics Table Wrapper
+.metrics-table-wrapper {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $background-light;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $border-light;
+        border-radius: 4px;
+
+        &:hover {
+            background: darken($border-light, 10%);
+        }
+    }
+
+    // Minimized table height
+    &.minimized {
+        max-height: 300px;
+    }
+}
+
+// Metrics Table
+.metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: $white;
+
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    thead th {
+        padding: 14px 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: $text-primary;
+        border-bottom: 2px solid $border-light;
+        background: $background-light;
+
+        &:last-child {
+            text-align: right;
+        }
+    }
+
+    tbody tr {
+        transform: translateZ(0);
+        will-change: background, transform;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+
+        &:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        &:hover {
+            background: $gradient-light;
+            transform: scale(1.005) translateZ(0);
+        }
+
+        &:last-child {
+            border-bottom: none;
+
+            td {
+                border-bottom: none;
+            }
+        }
+    }
+}
+
+.metric-name {
+    padding: 14px 20px;
+    font-weight: 500;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    vertical-align: middle;
+}
+
+.metric-value {
+    padding: 14px 20px;
+    font-weight: 600;
+    color: $primary-orange;
+    font-size: 15px;
+    text-align: right;
+    vertical-align: middle;
+}
+
+// Tooltip for metric definitions
+.metric-row-hover {
+    position: relative;
+    cursor: help;
+
+    &[data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: normal;
+        max-width: 300px;
+        text-align: left;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        margin-bottom: 5px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    &:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+// ============================================================================
+// SCROLL TO BOTTOM BUTTON
+// ============================================================================
+
+.scroll-to-bottom-btn {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: $white;
+    border: 1px solid $border-light;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 100;
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-primary;
+    animation: slideUpFadeIn 0.3s ease-out;
+
+    &:hover {
+        background: $gradient-primary;
+        color: $white;
+        border-color: transparent;
+        transform: translateX(-50%) translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    &:hover svg {
+        stroke: $white;
+        animation: bounce 0.6s ease-in-out infinite;
+    }
+
+    &:active {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    svg {
+        flex-shrink: 0;
+        stroke: $text-primary;
+        transition: all 0.3s ease;
+    }
+
+    span {
+        white-space: nowrap;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+}
+
+// ============================================================================
+// INPUT CONTAINER
+// ============================================================================
+
+.input-container {
+    padding: 16px 20px;
+    background: $white;
+    border-radius: 0 0 24px 24px;
+    border-top: 1px solid $border-lighter;
+    flex-shrink: 0;
+}
+
+.input-wrapper {
+    @include flex-end;
+    background: $white;
+    border-radius: 24px;
+    padding: 8px 12px 8px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid $border-light;
+    @include transition-base;
+    gap: 12px;
+
+    &:focus-within {
+        border-color: $primary-purple;
+        box-shadow: 0 2px 12px rgba(139, 124, 216, 0.2);
+    }
+}
+
+.input-section {
+    flex: 1;
+    @include flex-end;
+    gap: 8px;
+
+    .input-icon {
+        color: $text-muted;
+        @include flex-center;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    .message-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 8px 0;
+        font-size: 14px;
+        outline: none;
+        color: $text-primary;
+        line-height: 1.4;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+        &::placeholder {
+            color: $text-muted;
+            font-size: 14px;
+        }
+
+        &:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px $white inset;
+            -webkit-text-fill-color: $text-primary;
+        }
+    }
+}
+
+.message-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 14px;
+    outline: none;
+    color: $text-primary;
+    line-height: 1.4;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    resize: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    &::placeholder {
+        color: $text-muted;
+        font-size: 14px;
+    }
+}
+
+.controls-section {
+    @include flex-center;
+    gap: 8px;
+}
+
+.right-controls {
+    @include flex-center;
+    gap: 8px;
+}
+
+.send-button {
+    background: $suggestion-color;
+    color: $white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    border-radius: 50%;
+    @include flex-center;
+    cursor: pointer;
+    @include transition-base;
+
+    &:hover:not(:disabled) {
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(253, 126, 79, 0.4);
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+// ============================================================================
+// ANIMATIONS
+// ============================================================================
+
+@keyframes slideInSuggestion {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes typing-bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6) translateY(0);
+        opacity: 0.3;
+    }
+
+    40% {
+        transform: scale(1) translateY(-10px);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes slideUpFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(3px);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInProcessing {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - TABLET
+// ============================================================================
+
+@media (max-width: 768px) {
+    .chat-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        bottom: 0;
+        right: 0;
+
+        &.maximized {
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        &.collapsed {
+            width: 260px;
+            border-radius: 16px;
+        }
+    }
+
+    .chat-header {
+        border-radius: 0;
+        padding: 20px 24px;
+
+        .chat-title {
+            font-size: 18px;
+
+            .subtitle {
+                font-size: 12px;
+            }
+        }
+    }
+
+    .message-content {
+        max-width: 90%;
+    }
+
+    .suggestions-content {
+        max-width: 85%;
+
+        .suggestion-btn {
+            min-width: 180px;
+            padding: 12px 20px;
+            font-size: 13px;
+        }
+    }
+
+    .suggestions-wrapper {
+        margin-left: 36px;
+    }
+
+    .input-wrapper {
+        padding: 10px 14px;
+    }
+
+    .floating-chat-button {
+        bottom: 16px;
+        right: 16px;
+
+        .fab-content {
+            width: 48px;
+            height: 48px;
+
+            .fab-avatar {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN - MOBILE
+// ============================================================================
+
+@media (max-width: 480px) {
+    .chat-container {
+        width: 100%;
+        height: 100vh;
+
+        &.collapsed {
+            width: 240px;
+            border-radius: 16px;
+        }
+    }
+
+    .chat-header {
+        padding: 16px 20px;
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+        }
+
+        .chat-title {
+            font-size: 16px;
+        }
+
+        .header-actions {
+            gap: 8px;
+        }
+
+        .clear-context-btn,
+        .export-chat-btn {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .maximize-btn,
+        .collapse-btn {
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    .messages-container {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .message-avatar .avatar-small {
+        width: 28px;
+        height: 28px;
+    }
+
+    .suggestion-btn {
+        min-width: 160px;
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+
+    .suggestions-wrapper {
+        margin-left: 32px;
+    }
+
+    .input-container {
+        padding: 16px 20px;
+    }
+
+    .send-button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .metrics-container,
+    .table-container {
+        margin: 12px 16px;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .scroll-to-bottom-btn {
+        bottom: 90px;
+        padding: 10px 16px;
+        font-size: 13px;
+
+        span {
+            display: none;
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    .floating-chat-button {
+        bottom: 16px;
+        right: 16px;
+
+        .fab-content {
+            width: 48px;
+            height: 48px;
+
+            .fab-avatar {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    }
+}
+
+// ============================================================================
+// PRINT STYLES
+// ============================================================================
+
+@media print {
+    .chat-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+
+    .header-actions,
+    .input-container,
+    .action-buttons,
+    .suggestions-wrapper {
+        display: none;
+    }
+
+    .message-bubble {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .typing-indicator {
+        display: none;
+    }
+}

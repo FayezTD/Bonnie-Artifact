@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "ignorePatterns": ["projects/**/*"],
+  "extends": [
+    "@angular-eslint/recommended",
+    "@angular-eslint/template/process-inline-templates",
+    "prettier"
+  ],
+  "plugins": ["prettier", "editorconfig"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": [
+        "@angular-eslint/recommended",
+        "@angular-eslint/template/process-inline-templates",
+        "@typescript-eslint/recommended",
+        "prettier"
+      ],
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          { "type": "attribute", "prefix": "app", "style": "camelCase" }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          { "type": "element", "prefix": "app", "style": "kebab-case" }
+        ],
+        "prettier/prettier": "error"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["@angular-eslint/template/recommended"],
+      "rules": {}
+    },
+    {
+      "files": ["*.stories.@(js|jsx|ts|tsx)"],
+      "extends": ["plugin:storybook/recommended"]
+    }
+  ]
+}

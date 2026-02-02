@@ -1,0 +1,148 @@
+<!-- src/app/components/chat-form/chat-form.component.html -->
+
+<!-- ============================================================================ -->
+<!-- CHAT FORM CONTAINER -->
+<!-- ============================================================================ -->
+<div class="chat-form-container">
+
+    <!-- ========================================================================== -->
+    <!-- FORM HEADER -->
+    <!-- ========================================================================== -->
+    <div class="form-header">
+        <h3 class="form-title">{{ formData.title }}</h3>
+        <p class="form-description" *ngIf="formData.description">
+            {{ formData.description }}
+        </p>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- DYNAMIC FORM -->
+    <!-- ========================================================================== -->
+    <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" class="dynamic-form">
+
+        <div class="form-fields">
+            <div *ngFor="let field of formData.fields" class="form-field">
+
+                <!-- ================================================================== -->
+                <!-- TEXT & EMAIL INPUT -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'text' || field.type === 'email'" class="input-group">
+                    <label [for]="field.key" class="field-label">
+                        {{ field.label }}
+                        <span *ngIf="field.required" class="required-asterisk">*</span>
+                    </label>
+                    <input [id]="field.key" [formControlName]="field.key" [type]="field.type"
+                        [placeholder]="field.placeholder || ''" class="form-input"
+                        [class.error]="isFieldInvalid(field.key)" />
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+                <!-- ================================================================== -->
+                <!-- NUMBER INPUT -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'number'" class="input-group">
+                    <label [for]="field.key" class="field-label">
+                        {{ field.label }}
+                        <span *ngIf="field.required" class="required-asterisk">*</span>
+                    </label>
+                    <input [id]="field.key" [formControlName]="field.key" type="number"
+                        [placeholder]="field.placeholder || ''" class="form-input"
+                        [class.error]="isFieldInvalid(field.key)" />
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+                <!-- ================================================================== -->
+                <!-- TEXTAREA -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'textarea'" class="input-group">
+                    <label [for]="field.key" class="field-label">
+                        {{ field.label }}
+                        <span *ngIf="field.required" class="required-asterisk">*</span>
+                    </label>
+                    <textarea [id]="field.key" [formControlName]="field.key" [placeholder]="field.placeholder || ''"
+                        class="form-textarea" [class.error]="isFieldInvalid(field.key)" rows="3">
+          </textarea>
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+                <!-- ================================================================== -->
+                <!-- SELECT DROPDOWN -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'select'" class="input-group">
+                    <label [for]="field.key" class="field-label">
+                        {{ field.label }}
+                        <span *ngIf="field.required" class="required-asterisk">*</span>
+                    </label>
+                    <select [id]="field.key" [formControlName]="field.key" class="form-select"
+                        [class.error]="isFieldInvalid(field.key)">
+                        <option value="">
+                            {{ field.placeholder || 'Select an option' }}
+                        </option>
+                        <option *ngFor="let option of field.options" [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+                <!-- ================================================================== -->
+                <!-- CHECKBOX -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'checkbox'" class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input [id]="field.key" [formControlName]="field.key" type="checkbox" class="form-checkbox" />
+                        <span class="checkbox-text">
+                            {{ field.label }}
+                            <span *ngIf="field.required" class="required-asterisk">*</span>
+                        </span>
+                    </label>
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+                <!-- ================================================================== -->
+                <!-- RADIO BUTTONS -->
+                <!-- ================================================================== -->
+                <div *ngIf="field.type === 'radio'" class="radio-group">
+                    <label class="field-label">
+                        {{ field.label }}
+                        <span *ngIf="field.required" class="required-asterisk">*</span>
+                    </label>
+                    <div class="radio-options">
+                        <label *ngFor="let option of field.options" class="radio-label">
+                            <input [formControlName]="field.key" type="radio" [value]="option.value"
+                                class="form-radio" />
+                            <span class="radio-text">{{ option.label }}</span>
+                        </label>
+                    </div>
+                    <div *ngIf="isFieldInvalid(field.key)" class="error-message">
+                        {{ getFieldError(field.key) }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ======================================================================== -->
+        <!-- FORM ACTIONS -->
+        <!-- ======================================================================== -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="onCancel()">
+                {{ formData.cancelLabel || 'Cancel' }}
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="dynamicForm.invalid || isSubmitting">
+                <span *ngIf="isSubmitting" class="loading-spinner"></span>
+                {{ formData.submitLabel || 'Submit' }}
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,48 @@
+<!-- src/app/parent-page/parent-page.component.html -->
+
+<!-- ============================================================================ -->
+<!-- PARENT CONTAINER -->
+<!-- ============================================================================ -->
+<div class="parent-container" (click)="onDocumentClick($event)">
+
+    <!-- ========================================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================================================== -->
+    <header class="page-header">
+        <div class="header-left">
+            <div class="brand-container">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="../../assets/Kobie_Alchemy_Loyalty_Cloud.png" alt="Kobie Alchemy Logo"
+                            class="logo-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================== -->
+    <!-- MAIN CONTENT AREA -->
+    <!-- ========================================================================== -->
+    <main class="main-content">
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+
+            <!-- ==================================================================== -->
+            <!-- CHAT SECTION -->
+            <!-- ==================================================================== -->
+            <div class="chat-section">
+                <div class="chat-container-wrapper">
+
+                    <!-- Chat Component - Always enabled -->
+                    <div class="chat-wrapper">
+                        <app-chat [title]="chatTitle" [authToken]="authToken" [userRole]="userRole"
+                            (messageEvent)="handleNewChatMessage($event)">
+                        </app-chat>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
