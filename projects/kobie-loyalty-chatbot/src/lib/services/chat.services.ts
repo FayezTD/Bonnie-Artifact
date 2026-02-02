@@ -29,7 +29,7 @@ export class ChatService {
 
   // API Configuration
   private authToken = 'Bearer mock-jwt-token-123456789';
-  private readonly API_BASE_URL = environment.apiBaseUrl;
+  private readonly API_BASE_URL = defaultEnvironment.apiBaseUrl;
 
   // API Endpoints
   private readonly ENDPOINTS = {
